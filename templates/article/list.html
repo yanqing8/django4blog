@@ -1,0 +1,109 @@
+<!-- extends表明此页面继承自 base.html 文件 -->
+{% extends "base.html" %}
+{% load static %}
+
+<!-- 写入 base.html 中定义的 title -->
+{% block title %}
+    首页
+{% endblock title %}
+
+<!-- 写入 base.html 中定义的 content -->
+{% block content %}
+    <!-- 定义放置文章标题的div容器 -->
+    <br>
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'list' %}">
+                        最新
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'list' %}?order=total_views">
+                        最热
+                    </a>
+                </li>
+            </ol>
+        </nav>
+        <!-- 搜索栏 -->
+        <div class="row">
+            <div class="col-auto mr-auto">
+                <form class="form-inline">
+                    {#                <label class="sr-only">content</label>#}
+                    <input type="text"
+                           class="form-control mb-2 mr-sm-2"
+                           name="search"
+                           placeholder="搜索文章..."
+                           required
+                    >
+                </form>
+            </div>
+        </div>
+        <!-- 搜索提示语 -->
+        {% if search %}
+            {% if articles %}
+                <h4><span style="color: red">"{{ search }}"</span>的搜索结果如下：</h4>
+                <hr>
+            {% else %}
+                <h4>暂无<span style="color: red">"{{ search }}"</span>有关的文章。</h4>
+                <hr>
+            {% endif %}
+        {% endif %}
+        {% for article in articles %}
+            <div class="row mt-2">
+                <!-- 文章内容 -->
+                <div class="col-sm-12">
+                    <!-- 卡片容器 -->
+                    <div class="card h-100">
+                        <!-- 标题 -->
+                        <!-- 摘要 -->
+                        <div class="card-body">
+                            <h4 class="card-title">{{ article.title }}</h4>
+                            <br>
+                            <p class="card-text">{{ article.body|slice:'100' }}...</p>
+                            <a href="{% url 'detail' article.id %}" class="card-link">阅读本文</a>
+                            <small class="col align-self-end" style="color: gray;">
+                            <span class="bi bi-eye">
+                            {{ article.total_views }}
+                            </span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <!-- 页码导航 -->
+        <div class="pagination row">
+            <div class="m-auto">
+        <span class="step-links">
+            <!-- 如果不是第一页，则显示上翻按钮 -->
+            {% if articles.has_previous %}
+                <span>...</span>
+                <a href="?page=1&order={{ order }}" class="btn btn-success">
+                    &laquo; 1
+                </a>
+                <span>...</span>
+                <a href="?page={{ articles.previous_page_number }}&order={{ order }}"
+                   class="btn btn-secondary">
+                    {{ articles.previous_page_number }}
+                </a>
+            {% endif %}
+
+            <!-- 当前页面 -->
+            <span class="current btn btn-danger btn-lg">
+                {{ articles.number }}
+            </span>
+            <!-- 如果不是最末页，则显示下翻按钮 -->
+            {% if articles.has_next %}
+                <a href="?page={{ articles.next_page_number }}&order={{ order }}"
+                   class="btn btn-secondary">{{ articles.next_page_number }}</a>
+                <span>...</span>
+                <a href="?page={{ articles.paginator.num_pages }}&order={{ order }}"
+                   class="btn btn-success">{{ articles.paginator.num_pages }} &raquo;</a>
+            {% endif %}
+        </span>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
