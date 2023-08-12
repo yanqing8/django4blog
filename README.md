@@ -1,5 +1,5 @@
 # 欢迎使用 django4blog 手册
- 本项目参考CSDN李威威wiwi教程 [传送门](https://blog.csdn.net/agelee/category_11969257.html)。
+ 
 ## 本地部署
 ### 修改settings.py文件
 

@@ -1,25 +1,106 @@
 {% extends "base.html" %} {% load static %}
 {% block title %} 更新文章 {% endblock title %}
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
+    <style>
+        #center {
+            margin-top: 5%;
+            width: 96%;
+            height: 96%;
+            border: 1px;
+        }
+
+        img {
+            margin: auto;
+            margin-left: 30%;
+            height: 40%;
+            width: 40%;
+            position: relative;
+            top: 10%;
+        }
+
+        input {
+
+            width: 85%;
+            height: 30px;
+            border-width: 2px;
+            border-radius: 5px;
+            border-color: #00c4ff;
+            border-bottom-color: #2C7EEA;
+            color: #586e75;
+            font-size: 15px;
+
+        }
+
+        button {
+            width: 10%;
+            height: 35px;
+            border-width: 0px;
+            margin-left: 3%;
+            border-radius: 10px;
+            background: #1E90FF;
+            cursor: pointer;
+            outline: none;
+            font-family: Microsoft YaHei, serif;
+            color: white;
+            font-size: 17px;
+        }
+
+        button:hover {
+            background-color: #1E90FF;
+            box-shadow: 0 4px 0 powderblue;
+        }
+    </style>
+    <!-- 写文章表单 -->
+    <!-- 提交文章的表单 -->
+    <form method="post" action=".">
+        <!-- Django中需要POST数据的地方都必须有csrf_token -->
+        {% csrf_token %}
+        <!-- 文章标题 -->
+        <div class="form-group">
+            <div>
+                <input type="text" name="title" id="title" placeholder="请输入文章标题" value="{{ article.title }}"
+                       required>
+                <button type="submit" id="submit">发布文章</button>
+            </div>
             <br>
-            <form method="post" action=".">
+            <div id="editormd">
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="title">文章标题</label>
-                    <!-- 在 value 属性中指定文本框的初始值为旧的内容，即 article 对象中的 title 字段 -->
-                    <input type="text" class="form-control" id="title" name="title" value="{{ article.title }}">
-                </div>
-                <div class="form-group">
-                    <label for="body">文章正文</label>
-                    <!-- 文本域不需要 value 属性，直接在标签体中嵌入数据即可 -->
-                    <textarea type="text" class="form-control" id="body" name="body" rows="12">{{ article.body }}</textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">完成</button>
-            </form>
+                <label for="body">文章正文</label>
+                <textarea style="display:none;" name="body" id="body">{{ article.body }}</textarea>
+            </div>
         </div>
-    </div>
-</div>
+    </form>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{% static 'mdeditor/editormd.min.js' %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            var editor = editormd("editormd", {
+                width: "100%",
+                height: "800",
+                path: "{% static 'mdeditor/lib/' %}",
+                placeholder: "请开始你的书写之旅",
+                //增加图片上传配置
+                imageUpload: true,
+                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                imageUploadURL: "/upload/",//图片上传的地址（在你的项目里面的路由）
+                required: true,
+                saveHTMLToTextarea: true,
+                taskList: true,
+                tocm: true,
+                tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+                flowChart: true,             // 开启流程图支持，默认关闭
+                sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+
+            });
+
+        });
+        var body = document.getElementById("body");
+        body.required = true;
+        var button = document.getElementById("submit");
+        button.addEventListener("click", () => {
+            if (body.value === '') {
+                alert("博客内容不能为空");
+            }
+        });
+    </script>
 {% endblock content %}

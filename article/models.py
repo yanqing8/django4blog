@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 # timezone 用于处理时间相关事物
 from django.utils import timezone
+from mdeditor.fields import MDTextField
 
 
 # Create your models here.
@@ -16,7 +17,7 @@ class Article(models.Model):
     # 文章标题
     title = models.CharField(max_length=100)
     # 文章正文,保存大量文本使用 TextField
-    body = models.TextField()
+    body = MDTextField()
     # 文章创建时间，参数 default=timezone.now 指定其在创建数据时将默认写入当前的时间
     created = models.DateTimeField(default=timezone.now)
     # 浏览量字段

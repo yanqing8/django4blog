@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'userprofile',
     'comment',
     'corsheaders',  # 解决浏览器跨域问题
+    'mdeditor'
 ]
 
 MIDDLEWARE = [
@@ -64,6 +65,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')  # 新建一个uploads文件夹，且在项目目录下
+MEDIA_URL = '/media/'  # 你上传的文件和图片会默认存在/uploads/editor下 这一步不用创建任何文件夹，这个是那个插件帮我们做好了，做好了一个图片上传，后面我们自己在前端做编辑器的话我么还要自己再实现一个。
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 CORS_ORIGIN_ALLOW_ALL = True  # 解决浏览器跨域问题
 CORS_ALLOW_CREDENTIALS = True  # 解决浏览器跨域问题
@@ -100,7 +104,7 @@ DATABASES = {
         'HOST': '127.0.0.1',  # 数据库地址
         'PORT': 3306,  # 端口
         'USER': 'root',  # 用户名
-        'PASSWORD': '',  # 数据库密码
+        'PASSWORD': 'x555777hy',  # 数据库密码
     }
 }
 

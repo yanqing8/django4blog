@@ -5,33 +5,105 @@
 {% block title %} 写文章 {% endblock title %}
 <!-- 写入 base.html 中定义的 content -->
 {% block content %}
-<!-- 写文章表单 -->
-<div class="container">
-  <div class="row">
-    <div class="col-12">
-      <br>
-      <!-- 提交文章的表单 -->
-      <form method="post" action=".">
+    <style>
+        #center {
+            margin-top: 5%;
+            width: 96%;
+            height: 96%;
+            border: 1px;
+        }
+
+        img {
+            margin: auto;
+            margin-left: 30%;
+            height: 40%;
+            width: 40%;
+            position: relative;
+            top: 10%;
+        }
+
+        input {
+
+            width: 85%;
+            height: 30px;
+            border-width: 2px;
+            border-radius: 5px;
+            border-color: #00c4ff;
+            border-bottom-color: #2C7EEA;
+            color: #586e75;
+            font-size: 15px;
+
+        }
+
+        button {
+            width: 10%;
+            height: 35px;
+            border-width: 0px;
+            margin-left: 3%;
+            border-radius: 10px;
+            background: #1E90FF;
+            cursor: pointer;
+            outline: none;
+            font-family: Microsoft YaHei, serif;
+            color: white;
+            font-size: 17px;
+        }
+
+        button:hover {
+            background-color: #1E90FF;
+            box-shadow: 0 4px 0 powderblue;
+        }
+    </style>
+    <!-- 写文章表单 -->
+    <!-- 提交文章的表单 -->
+    <form method="post" action=".">
         <!-- Django中需要POST数据的地方都必须有csrf_token -->
         {% csrf_token %}
         <!-- 文章标题 -->
         <div class="form-group">
-          <!-- 标签 -->
-          <label for="title">文章标题</label>
-          <!-- 文本框 -->
-          <input type="text" class="form-control" id="title" name="title">
+            <div>
+                <input type="text" name="title" id="title" placeholder="请输入文章标题" required>
+                <button type="submit" id="submit">发布文章</button>
+            </div>
+            <br>
+            <div id="editormd">
+                {% csrf_token %}
+                <label for="body">文章正文</label>
+                <textarea style="display:none;" name="body" id="body"></textarea>
+            </div>
         </div>
-        <!-- 文章正文 -->
-        <div class="form-group">
-          <label for="body">文章正文</label>
-          <!-- 文本区域 -->
-          <textarea type="text" class="form-control" id="body" name="body" rows="12"></textarea>
-        </div>
-        <!-- 提交按钮 -->
-        <br>
-        <button type="submit" class="btn btn-primary">完成</button>
-      </form>
-    </div>
-  </div>
-</div>
+    </form>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{% static 'mdeditor/editormd.min.js' %}"></script>
+    <script type="text/javascript">
+        $(function () {
+            var editor = editormd("editormd", {
+                width: "100%",
+                height: "800",
+                path: "{% static 'mdeditor/lib/' %}",
+                placeholder: "请开始你的书写之旅",
+                //增加图片上传配置
+                imageUpload: true,
+                imageFormats: ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                imageUploadURL: "/upload/",//图片上传的地址（在你的项目里面的路由）
+                required: true,
+                saveHTMLToTextarea: true,
+                taskList: true,
+                tocm: true,
+                tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+                flowChart: true,             // 开启流程图支持，默认关闭
+                sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+
+            });
+
+        });
+        var body = document.getElementById("body");
+        body.required = true;
+        var button = document.getElementById("submit");
+        button.addEventListener("click", () => {
+            if (body.value === '') {
+                alert("博客内容不能为空");
+            }
+        });
+    </script>
 {% endblock content %}

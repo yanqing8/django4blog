@@ -1,10 +1,43 @@
+import markdown
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import Article
 from .forms import ArticleForm
 from comment.models import Comment
+
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+import os
+import time
+import uuid
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+@csrf_exempt
+@xframe_options_sameorigin
+def upload(request):
+    if request.method == "POST":
+        obj = request.FILES.get('editormd-image-file')
+
+        file_name = time.strftime('%Y%m%d%H%M%S') + str(uuid.uuid1().hex) + '.' + obj.name.split('.')[-1]  # 图片文件名
+        data_path = time.strftime('%Y%m')
+        print(data_path)
+        dir_path = os.path.join(BASE_DIR, 'static', 'upload', data_path)  # 保存的文件目录
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        img_path = os.path.join(dir_path, file_name)  # 存储的完整图片路径（绝对路径）
+        f = open(img_path, 'wb')
+        for chunk in obj.chunks():
+            f.write(chunk)
+        f.close()
+        data = {"success": 1, "message": "上传成功", "url": '/static/upload/' +data_path+'/'+file_name}
+        return JsonResponse(data)
+
+    else:
+        return JsonResponse({"success": 0, "message": "上传失败"})
+
 
 
 # Create your views here.
@@ -105,7 +138,8 @@ def article_list(request):
     if search:
         if order == 'total_views':
             # 用 Q对象 进行联合搜索
-            articles_list = Article.objects.filter(Q(title__icontains=search) | Q(body__icontains=search)).order_by('-total_views')
+            articles_list = Article.objects.filter(Q(title__icontains=search) | Q(body__icontains=search)).order_by(
+                '-total_views')
         else:
             articles_list = Article.objects.filter(Q(title__icontains=search) | Q(body__icontains=search))
     else:
@@ -136,6 +170,12 @@ def article_detail(request, id):
     # 浏览量 +1
     article.total_views += 1
     article.save(update_fields=['total_views'])
+    article.body = markdown.markdown(article.body,
+                                     extensions=[
+                                         'markdown.extensions.extra',
+                                         'markdown.extensions.codehilite',
+                                         'markdown.extensions.toc',
+                                     ])
     # 取出文章评论
     comments = Comment.objects.filter(article=id)
     # 需要传递给模板的对象

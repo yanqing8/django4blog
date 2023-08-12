@@ -15,10 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
+from django.conf.urls.static import static
 import article.views
 import comment.views
 import userprofile.views
+from django4blog import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,10 +33,16 @@ urlpatterns = [
     path('delete/<int:id>/', article.views.article_delete, name='delete'),  # 文章删除
     path('update/<int:id>/', article.views.article_update, name='update'),  # 文章更新
 
-
     path('login/', userprofile.views.user_login, name='login'),
     path('logout/', userprofile.views.user_logout, name='logout'),
     path('register/', userprofile.views.user_register, name='register'),
 
-    path('post-comment/<int:article_id>/', comment.views.post_comment, name='post_comment')
+    path('post-comment/<int:article_id>/', comment.views.post_comment, name='post_comment'),
+
+    path('mdeditor/', include('mdeditor.urls')),
+    path('upload/', article.views.upload, name='upload')
 ]
+
+if settings.DEBUG:
+    # static files (images, css, javascript, etc.)主要是让页面显示正常
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
